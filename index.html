@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>bridleapp · hello</title>
+<style>
+  html,body{margin:0;height:100%;background:#0b0d10;color:#e7ecf2;
+    font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+    display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
+  .card{max-width:520px}
+  h1{margin:0 0 12px;font-size:22px;font-weight:600}
+  p{margin:6px 0;color:#8a95a3}
+  code{background:#13171c;border:1px solid #262e38;border-radius:6px;padding:2px 6px;color:#7cd0ff;font-size:13px}
+  .ok{color:#5ad19a;font-weight:600}
+  .ts{margin-top:18px;font-variant-numeric:tabular-nums;font-size:13px;color:#8a95a3}
+  button{margin-top:18px;background:#7cd0ff;color:#001321;border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>👋 bridleapp · hello</h1>
+    <p>If you can read this on <code id="host">…</code>, the deploy pipeline works.</p>
+    <p class="ok">Status: <span id="status">live</span></p>
+    <button id="btn">click to confirm JS works</button>
+    <p class="ts">build: <span id="build">…</span></p>
+    <p class="ts">loaded: <span id="loaded">…</span></p>
+  </div>
+<script>
+  document.getElementById("host").textContent = location.host || "(local file)";
+  document.getElementById("build").textContent = "2026-05-03 09:43 UTC";
+  document.getElementById("loaded").textContent = new Date().toISOString().replace("T"," ").slice(0,19) + " UTC";
+  document.getElementById("btn").addEventListener("click", e => {
+    e.target.textContent = "✓ JS works · " + new Date().toLocaleTimeString();
+    e.target.style.background = "#5ad19a";
+  });
+</script>
+</body>
+</html>
