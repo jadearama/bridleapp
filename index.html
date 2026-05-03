@@ -3,37 +3,304 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>bridleapp · hello</title>
+<meta name="theme-color" content="#0b0d10">
+<title>Parawing bridle · Calculator 1</title>
 <style>
-  html,body{margin:0;height:100%;background:#0b0d10;color:#e7ecf2;
-    font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
-    display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
-  .card{max-width:520px}
-  h1{margin:0 0 12px;font-size:22px;font-weight:600}
-  p{margin:6px 0;color:#8a95a3}
-  code{background:#13171c;border:1px solid #262e38;border-radius:6px;padding:2px 6px;color:#7cd0ff;font-size:13px}
-  .ok{color:#5ad19a;font-weight:600}
-  .ts{margin-top:18px;font-variant-numeric:tabular-nums;font-size:13px;color:#8a95a3}
-  button{margin-top:18px;background:#7cd0ff;color:#001321;border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+  :root{
+    --bg:#0b0d10; --panel:#13171c; --panel2:#1a2028; --line:#262e38;
+    --ink:#e7ecf2; --muted:#8a95a3; --accent:#7cd0ff; --accent2:#ffd479;
+    --bad:#ff6b6b; --ok:#5ad19a; --warn:#ffb259;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+  header{padding:14px 16px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    position:sticky;top:0;background:var(--bg);z-index:5}
+  header h1{font-size:16px;margin:0;font-weight:600;letter-spacing:.2px}
+  header .sub{color:var(--muted);font-size:12px}
+  main{max-width:760px;margin:0 auto;padding:14px;display:grid;gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .card h2{font-size:12px;margin:0 0 10px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.7px;font-weight:600}
+  label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+  input[type=number]{width:100%;padding:11px 12px;background:var(--panel2);
+    border:1px solid var(--line);border-radius:8px;color:var(--ink);
+    font:inherit;font-variant-numeric:tabular-nums;outline:none;
+    -moz-appearance:textfield}
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  input[type=number]:focus{border-color:var(--accent)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .out{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:14px;text-align:center}
+  .out .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+  .out .v{font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;
+    margin:6px 0 2px;color:var(--ok)}
+  .out .small{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+  .out.bad .v{color:var(--bad)}
+  .out.warn .v{color:var(--warn)}
+  svg{width:100%;height:auto;display:block;background:var(--panel2);
+    border-radius:8px;border:1px solid var(--line)}
+  details{border:1px dashed var(--line);border-radius:10px;padding:10px 12px;
+    background:var(--panel2)}
+  details>summary{cursor:pointer;color:var(--accent);font-size:13px;font-weight:500;
+    list-style:none;display:flex;align-items:center;gap:6px}
+  details>summary::before{content:"▸";color:var(--muted);transition:transform .15s}
+  details[open]>summary::before{transform:rotate(90deg);display:inline-block}
+  details ol{padding-left:18px;margin:10px 0 4px;color:var(--ink);font-size:13px}
+  details li{margin:6px 0}
+  details .field{color:var(--accent);font-weight:600}
+  details .note{color:var(--muted);font-size:12px;margin-top:8px}
+  details code{background:#0b0d10;border:1px solid var(--line);border-radius:4px;
+    padding:1px 5px;font-size:12px;color:var(--accent2)}
+  .badge{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:999px;padding:2px 8px;font-size:11px;color:var(--muted);
+    margin-left:6px;vertical-align:middle}
+  .legend{font-size:12px;color:var(--muted);margin-top:6px;display:flex;gap:14px;flex-wrap:wrap}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;
+    margin-right:5px;vertical-align:middle}
+  .footer{color:var(--muted);font-size:11px;text-align:center;padding:14px 8px 24px}
+  .err{color:var(--bad);font-size:12px;margin-top:6px;min-height:1em}
 </style>
 </head>
 <body>
-  <div class="card">
-    <h1>👋 bridleapp · hello</h1>
-    <p>If you can read this on <code id="host">…</code>, the deploy pipeline works.</p>
-    <p class="ok">Status: <span id="status">live</span></p>
-    <button id="btn">click to confirm JS works</button>
-    <p class="ts">build: <span id="build">…</span></p>
-    <p class="ts">loaded: <span id="loaded">…</span></p>
+
+<header>
+  <div>
+    <h1>Parawing bridle <span class="badge">Calc 1 · A-row stepper</span></h1>
+    <div class="sub">amain → a3 from amain → a2, given the arc</div>
   </div>
+</header>
+
+<main>
+
+  <details class="card" id="how">
+    <summary>How this works · tap to expand</summary>
+    <ol>
+      <li>You measure (or pick) the bridle length from <span class="field">amain → a2</span>.</li>
+      <li>You decide where <span class="field">a3</span> sits — i.e. the arc-step <span class="field">s</span> from a2 along the leading edge.</li>
+      <li>You define the leading-edge arc with its <span class="field">radius R</span> and total <span class="field">LE length</span>. Together they fix the wing's curvature and span.</li>
+      <li>The calc places <span class="field">amain</span> on the wing's vertical centreline at whatever height makes amain → a2 = your input. Then it computes amain → a3.</li>
+    </ol>
+    <div class="note"><b>Assumptions (v1):</b> 2D front view; wing leading edge is a circular arc; amain sits centred on the wing's symmetry line; geometry is symmetric. No fore/aft (chord) component yet — every a-row attachment is treated as on the leading edge. Tell me in chat what to extend.</div>
+    <div class="note"><b>Math (for the record):</b><br>
+      <code>θ₂ = d_a2 / R</code> &nbsp;
+      <code>h = √(L_a2² − R²·sin²θ₂) − R·(1 − cosθ₂)</code><br>
+      <code>θ₃ = (d_a2 + s) / R</code> &nbsp;
+      <code>L_a3 = √(R²·sin²θ₃ + (R + h − R·cosθ₃)²)</code>
+    </div>
+  </details>
+
+  <section class="card">
+    <h2>Wing arc</h2>
+    <div class="row">
+      <div>
+        <label>Arc radius <b>R</b> (cm)</label>
+        <input type="number" id="R" value="180" min="1" step="1" inputmode="decimal">
+      </div>
+      <div>
+        <label>LE length tip-to-tip (cm)</label>
+        <input type="number" id="LE" value="220" min="1" step="1" inputmode="decimal">
+      </div>
+    </div>
+    <div class="err" id="archelp"></div>
+  </section>
+
+  <section class="card">
+    <h2>Reference point a2</h2>
+    <div class="row">
+      <div>
+        <label>d(a2) — arc distance from centreline (cm)</label>
+        <input type="number" id="d2" value="12" min="0" step="0.5" inputmode="decimal">
+      </div>
+      <div>
+        <label>L(amain → a2) — measured (cm)</label>
+        <input type="number" id="L2" value="160" min="1" step="0.5" inputmode="decimal">
+      </div>
+    </div>
+    <div class="err" id="refhelp"></div>
+  </section>
+
+  <section class="card">
+    <h2>Step to a3</h2>
+    <label>s — arc step a2 → a3 (cm)</label>
+    <input type="number" id="s" value="20" step="0.5" inputmode="decimal">
+    <div class="err" id="stephelp"></div>
+  </section>
+
+  <section class="out" id="result">
+    <div class="k">L (amain → a3)</div>
+    <div class="v" id="L3">—</div>
+    <div class="small" id="meta">—</div>
+  </section>
+
+  <section class="card">
+    <h2>Front view</h2>
+    <svg id="diagram" viewBox="0 0 400 280" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="legend">
+      <span><i style="background:#5ad19a"></i>amain</span>
+      <span><i style="background:#7cd0ff"></i>a2</span>
+      <span><i style="background:#ffd479"></i>a3</span>
+      <span><i style="background:#5b6776"></i>leading edge arc</span>
+    </div>
+  </section>
+
+</main>
+
+<div class="footer">
+  build <span id="build">…</span> · single-file, no deps · iterate in chat → auto-redeploys
+</div>
+
 <script>
-  document.getElementById("host").textContent = location.host || "(local file)";
-  document.getElementById("build").textContent = "2026-05-03 09:43 UTC";
-  document.getElementById("loaded").textContent = new Date().toISOString().replace("T"," ").slice(0,19) + " UTC";
-  document.getElementById("btn").addEventListener("click", e => {
-    e.target.textContent = "✓ JS works · " + new Date().toLocaleTimeString();
-    e.target.style.background = "#5ad19a";
-  });
+"use strict";
+const $ = id => document.getElementById(id);
+const TAU = Math.PI * 2;
+
+function compute(){
+  const R  = +$("R").value;
+  const LE = +$("LE").value;
+  const d2 = +$("d2").value;
+  const L2 = +$("L2").value;
+  const s  = +$("s").value;
+
+  const errs = {arc:"", ref:"", step:""};
+  const result = {ok:false, L3:NaN, h:NaN, theta2:0, theta3:0, totalAngle:0, warn:""};
+
+  if (!(R>0 && LE>0)) { errs.arc = "R and LE length must be > 0."; render(result, errs); return; }
+  const totalAngle = LE / R;             // total tip-to-tip arc, radians
+  result.totalAngle = totalAngle;
+  if (totalAngle >= Math.PI) errs.arc = "LE/R ≥ π — arc would wrap past a half-circle. Increase R or shorten LE.";
+  const halfArc = LE / 2;                // arc-distance from centreline to tip
+
+  if (d2 < 0) errs.ref = "d(a2) must be ≥ 0.";
+  if (d2 > halfArc) errs.ref = `d(a2) = ${d2} cm is past the tip (max ${halfArc.toFixed(1)} cm).`;
+
+  const theta2 = d2 / R;
+  const minL2 = R * Math.sin(theta2);    // perpendicular distance from a2 to the centreline
+  if (L2 < minL2) errs.ref = `L(amain→a2) must be ≥ ${minL2.toFixed(2)} cm — otherwise amain would be inside the wing arc.`;
+
+  const d3 = d2 + s;
+  if (d3 < 0) errs.step = "a3 ends up on the other side of centreline (d2 + s < 0).";
+  if (d3 > halfArc) errs.step = `a3 (d=${d3.toFixed(1)} cm) is past the tip (max ${halfArc.toFixed(1)} cm).`;
+
+  if (errs.arc || errs.ref || errs.step) { render(result, errs); return; }
+
+  // Solve amain height h above arc apex.
+  const q = Math.sqrt(L2*L2 - R*R*Math.sin(theta2)*Math.sin(theta2));
+  const h = q - R*(1 - Math.cos(theta2));
+  if (h < 0) {
+    result.warn = `amain sits ${(-h).toFixed(2)} cm BELOW the arc apex. Geometry may be impossible — check inputs.`;
+  }
+
+  const theta3 = d3 / R;
+  const dx = R*Math.sin(theta3);
+  const dy = (R + h) - R*Math.cos(theta3);
+  const L3 = Math.sqrt(dx*dx + dy*dy);
+
+  result.ok = true; result.L3 = L3; result.h = h;
+  result.theta2 = theta2; result.theta3 = theta3;
+
+  render(result, errs);
+}
+
+function render(res, errs){
+  $("archelp").textContent = errs.arc;
+  $("refhelp").textContent = errs.ref;
+  $("stephelp").textContent = errs.step;
+
+  const card = $("result");
+  card.classList.remove("bad","warn");
+  if (!res.ok) {
+    $("L3").textContent = "—";
+    $("meta").textContent = "fix inputs above";
+    card.classList.add("bad");
+  } else {
+    $("L3").textContent = res.L3.toFixed(2) + " cm";
+    const delta = res.L3 - +$("L2").value;
+    const sign = delta >= 0 ? "+" : "−";
+    $("meta").innerHTML =
+      `Δ vs L(a2): <b>${sign}${Math.abs(delta).toFixed(2)} cm</b> &nbsp;·&nbsp; ` +
+      `amain height above apex h = <b>${res.h.toFixed(2)} cm</b> &nbsp;·&nbsp; ` +
+      `total LE arc = <b>${(res.totalAngle*180/Math.PI).toFixed(1)}°</b>`;
+    if (res.warn) { card.classList.add("warn"); $("meta").innerHTML += `<br><span style="color:var(--warn)">${res.warn}</span>`; }
+  }
+
+  drawDiagram(res);
+}
+
+function drawDiagram(res){
+  const svg = $("diagram");
+  const W = 400, H = 280, pad = 20;
+
+  if (!res.ok) { svg.innerHTML = `<text x="${W/2}" y="${H/2}" fill="#8a95a3" text-anchor="middle" font-size="13">diagram unavailable</text>`; return; }
+
+  const R  = +$("R").value;
+  const LE = +$("LE").value;
+  const d2 = +$("d2").value;
+  const s  = +$("s").value;
+  const halfAngle = (LE/R)/2;
+
+  // World coords: arc centre at (0,0); apex at (0,R); points at (R sinθ, R cosθ); amain at (0, R+h).
+  // SVG Y inverts (down is +).
+  const pts = [];
+  const samples = 60;
+  for (let i=0;i<=samples;i++){
+    const t = -halfAngle + (2*halfAngle)*(i/samples);
+    pts.push([R*Math.sin(t), R*Math.cos(t)]);
+  }
+  const a2 = [R*Math.sin(res.theta2), R*Math.cos(res.theta2)];
+  const a3 = [R*Math.sin(res.theta3), R*Math.cos(res.theta3)];
+  const am = [0, R + res.h];
+
+  // Mirror points for visual symmetry context
+  const a2m = [-a2[0], a2[1]];
+  const a3m = [-a3[0], a3[1]];
+
+  const all = [...pts, a2, a3, am, a2m, a3m];
+  let minX=Infinity, maxX=-Infinity, minY=Infinity, maxY=-Infinity;
+  all.forEach(([x,y]) => { if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; });
+  const w = Math.max(1, maxX-minX), h = Math.max(1, maxY-minY);
+  const sc = Math.min((W-2*pad)/w, (H-2*pad)/h);
+  const ox = pad + (W-2*pad - w*sc)/2 - minX*sc;
+  const oy = pad + (H-2*pad - h*sc)/2 + maxY*sc;
+  const TX = p => ox + p[0]*sc;
+  const TY = p => oy - p[1]*sc;
+
+  const arcPath = pts.map((p,i)=> (i?"L":"M") + TX(p).toFixed(2) + " " + TY(p).toFixed(2)).join(" ");
+  let svgInner = `<path d="${arcPath}" stroke="#5b6776" stroke-width="2.5" fill="none"/>`;
+
+  // centreline (faint dashed)
+  svgInner += `<line x1="${TX([0,0])}" y1="${TY([0,Math.max(R+res.h, R)+5])}" x2="${TX([0,0])}" y2="${TY([0,minY-5])}" stroke="#262e38" stroke-width="1" stroke-dasharray="3,3"/>`;
+
+  // mirror context lines (faint)
+  svgInner += `<line x1="${TX(am)}" y1="${TY(am)}" x2="${TX(a2m)}" y2="${TY(a2m)}" stroke="#7cd0ff" stroke-width="1" opacity="0.25"/>`;
+  svgInner += `<line x1="${TX(am)}" y1="${TY(am)}" x2="${TX(a3m)}" y2="${TY(a3m)}" stroke="#ffd479" stroke-width="1" opacity="0.25"/>`;
+  svgInner += `<circle cx="${TX(a2m)}" cy="${TY(a2m)}" r="2.5" fill="#7cd0ff" opacity="0.4"/>`;
+  svgInner += `<circle cx="${TX(a3m)}" cy="${TY(a3m)}" r="2.5" fill="#ffd479" opacity="0.4"/>`;
+
+  // primary lines
+  svgInner += `<line x1="${TX(am)}" y1="${TY(am)}" x2="${TX(a2)}" y2="${TY(a2)}" stroke="#7cd0ff" stroke-width="1.6"/>`;
+  svgInner += `<line x1="${TX(am)}" y1="${TY(am)}" x2="${TX(a3)}" y2="${TY(a3)}" stroke="#ffd479" stroke-width="1.6"/>`;
+
+  // points
+  svgInner += `<circle cx="${TX(am)}" cy="${TY(am)}" r="5" fill="#5ad19a" stroke="#0b0d10" stroke-width="1.5"/>`;
+  svgInner += `<circle cx="${TX(a2)}" cy="${TY(a2)}" r="4" fill="#7cd0ff"/>`;
+  svgInner += `<circle cx="${TX(a3)}" cy="${TY(a3)}" r="4" fill="#ffd479"/>`;
+
+  // labels
+  const lab = (p, text, dx=8, dy=-6, color="#e7ecf2") =>
+    `<text x="${TX(p)+dx}" y="${TY(p)+dy}" fill="${color}" font-size="12" font-family="-apple-system,sans-serif">${text}</text>`;
+  svgInner += lab(am, "amain", 8, -8, "#5ad19a");
+  svgInner += lab(a2, "a2", 6, -6, "#7cd0ff");
+  svgInner += lab(a3, "a3", 6, 14, "#ffd479");
+
+  svg.innerHTML = svgInner;
+}
+
+["R","LE","d2","L2","s"].forEach(id => $(id).addEventListener("input", compute));
+compute();
+$("build").textContent = "2026-05-03 10:47 UTC";
 </script>
 </body>
 </html>
