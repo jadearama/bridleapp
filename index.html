@@ -86,9 +86,9 @@
     <div class="note"><b>Assumptions (v1):</b> 2D front view; wing leading edge is a circular arc; amain sits centred on the wing's symmetry line; geometry is symmetric. No fore/aft (chord) component yet — every a-row attachment is treated as on the leading edge. Tell me in chat what to extend.</div>
     <div class="note"><b>Math (for the record):</b><br>
       <code>θ₂ = d_a2 / R</code> &nbsp;
-      <code>h = √(L_a2² − R²·sin²θ₂) − R·(1 − cosθ₂)</code><br>
+      <code>H = R·(1 − cosθ₂) + √(L_a2² − R²·sin²θ₂)</code> &nbsp;<i>(amain hangs <b>below</b> the wing apex by H)</i><br>
       <code>θ₃ = (d_a2 + s) / R</code> &nbsp;
-      <code>L_a3 = √(R²·sin²θ₃ + (R + h − R·cosθ₃)²)</code>
+      <code>L_a3 = √(R²·sin²θ₃ + (H − R·(1 − cosθ₃))²)</code>
     </div>
   </details>
 
@@ -186,19 +186,23 @@ function compute(){
 
   if (errs.arc || errs.ref || errs.step) { render(result, errs); return; }
 
-  // Solve amain height h above arc apex.
+  // Solve amain depth H below the arc apex (parawing: anchor hangs below the wing).
   const q = Math.sqrt(L2*L2 - R*R*Math.sin(theta2)*Math.sin(theta2));
-  const h = q - R*(1 - Math.cos(theta2));
-  if (h < 0) {
-    result.warn = `amain sits ${(-h).toFixed(2)} cm BELOW the arc apex. Geometry may be impossible — check inputs.`;
+  const H = R*(1 - Math.cos(theta2)) + q;
+
+  // Check whether amain ends up above the wing tips (physically odd but mathematically allowed).
+  const tipY = R * Math.cos(LE/(2*R));
+  const amainY = R - H;
+  if (amainY > tipY) {
+    result.warn = `amain sits above the wing tips by ${(amainY - tipY).toFixed(1)} cm — unusual; check L(amain→a2).`;
   }
 
   const theta3 = d3 / R;
   const dx = R*Math.sin(theta3);
-  const dy = (R + h) - R*Math.cos(theta3);
+  const dy = H - R*(1 - Math.cos(theta3));
   const L3 = Math.sqrt(dx*dx + dy*dy);
 
-  result.ok = true; result.L3 = L3; result.h = h;
+  result.ok = true; result.L3 = L3; result.H = H;
   result.theta2 = theta2; result.theta3 = theta3;
 
   render(result, errs);
@@ -221,7 +225,7 @@ function render(res, errs){
     const sign = delta >= 0 ? "+" : "−";
     $("meta").innerHTML =
       `Δ vs L(a2): <b>${sign}${Math.abs(delta).toFixed(2)} cm</b> &nbsp;·&nbsp; ` +
-      `amain height above apex h = <b>${res.h.toFixed(2)} cm</b> &nbsp;·&nbsp; ` +
+      `amain depth below apex H = <b>${res.H.toFixed(2)} cm</b> &nbsp;·&nbsp; ` +
       `total LE arc = <b>${(res.totalAngle*180/Math.PI).toFixed(1)}°</b>`;
     if (res.warn) { card.classList.add("warn"); $("meta").innerHTML += `<br><span style="color:var(--warn)">${res.warn}</span>`; }
   }
@@ -251,7 +255,7 @@ function drawDiagram(res){
   }
   const a2 = [R*Math.sin(res.theta2), R*Math.cos(res.theta2)];
   const a3 = [R*Math.sin(res.theta3), R*Math.cos(res.theta3)];
-  const am = [0, R + res.h];
+  const am = [0, R - res.H];
 
   // Mirror points for visual symmetry context
   const a2m = [-a2[0], a2[1]];
@@ -270,8 +274,8 @@ function drawDiagram(res){
   const arcPath = pts.map((p,i)=> (i?"L":"M") + TX(p).toFixed(2) + " " + TY(p).toFixed(2)).join(" ");
   let svgInner = `<path d="${arcPath}" stroke="#5b6776" stroke-width="2.5" fill="none"/>`;
 
-  // centreline (faint dashed)
-  svgInner += `<line x1="${TX([0,0])}" y1="${TY([0,Math.max(R+res.h, R)+5])}" x2="${TX([0,0])}" y2="${TY([0,minY-5])}" stroke="#262e38" stroke-width="1" stroke-dasharray="3,3"/>`;
+  // centreline (faint dashed) — spans from above the apex down to amain
+  svgInner += `<line x1="${TX([0,0])}" y1="${TY([0,R+5])}" x2="${TX([0,0])}" y2="${TY([0,(R-res.H)-5])}" stroke="#262e38" stroke-width="1" stroke-dasharray="3,3"/>`;
 
   // mirror context lines (faint)
   svgInner += `<line x1="${TX(am)}" y1="${TY(am)}" x2="${TX(a2m)}" y2="${TY(a2m)}" stroke="#7cd0ff" stroke-width="1" opacity="0.25"/>`;
@@ -291,16 +295,16 @@ function drawDiagram(res){
   // labels
   const lab = (p, text, dx=8, dy=-6, color="#e7ecf2") =>
     `<text x="${TX(p)+dx}" y="${TY(p)+dy}" fill="${color}" font-size="12" font-family="-apple-system,sans-serif">${text}</text>`;
-  svgInner += lab(am, "amain", 8, -8, "#5ad19a");
+  svgInner += lab(am, "amain", 8, 14, "#5ad19a");
   svgInner += lab(a2, "a2", 6, -6, "#7cd0ff");
-  svgInner += lab(a3, "a3", 6, 14, "#ffd479");
+  svgInner += lab(a3, "a3", 6, -6, "#ffd479");
 
   svg.innerHTML = svgInner;
 }
 
 ["R","LE","d2","L2","s"].forEach(id => $(id).addEventListener("input", compute));
 compute();
-$("build").textContent = "2026-05-03 10:47 UTC";
+$("build").textContent = "2026-05-03 11:39 UTC";
 </script>
 </body>
 </html>
